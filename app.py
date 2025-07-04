@@ -2,6 +2,7 @@ from flask import (
     Flask, render_template, request, jsonify,
     redirect, url_for, session, flash
 )
+from flask_cors import CORS
 from instagrapi import Client
 from instagrapi.exceptions import (
     UserNotFound, PrivateAccount, BadPassword, ChallengeRequired
@@ -12,7 +13,11 @@ import os
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app, origins=["https://brunosillvax.github.io"])
+
 app.secret_key = os.getenv("SECRET_KEY") or "chave_secreta_qualquer"
+
+# resto do seu código segue igual
 
 cl = Client()
 session_path = "sessions/insta_session.json"

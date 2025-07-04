@@ -5,11 +5,27 @@
   <title>Coleta Instagram - Painel</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    /* Estilo rápido para o link sair */
+    .logout-link {
+      color: #39ff14;
+      float: right;
+      margin-bottom: 10px;
+      font-weight: bold;
+      text-decoration: none;
+      font-family: 'Poppins', sans-serif;
+      transition: color 0.3s ease;
+    }
+    .logout-link:hover {
+      color: #7fff7f;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
     <h1>Ferramenta Coleta Instagram</h1>
-    <a href="{{ url_for('logout') }}" style="color:#39ff14;float:right;margin-bottom:10px;"></a>
+    <a href="{{ url_for('logout') }}" class="logout-link">Sair</a>
+
     <form id="formBuscar">
       <input type="text" id="username" placeholder="Digite o @username" required />
       <button type="submit">Buscar</button>
