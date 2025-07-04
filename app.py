@@ -102,8 +102,7 @@ def buscar():
 
 @app.route("/api/comentarios", methods=["POST"])
 def comentarios():
-    if "usuario_logado" not in session:
-        return jsonify({"error": "Usuário não autenticado"}), 401
+
 
     data = request.json
     username = data.get("username", "").strip()
