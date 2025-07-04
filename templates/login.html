@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <title>Formulário de Login Neon</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+  />
+</head>
+<body>
+  <div class="box">
+    <div class="login">
+      <div class="loginBx">
+        <h2>
+          <i class="fa-solid fa-right-to-bracket"></i> Entrar
+        </h2>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="flash-messages">
+              {% for msg in messages %}
+                <p>{{ msg }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="/login">
+          <input
+            type="text"
+            name="usuario"
+            placeholder="Usuário"
+            required
+            autocomplete="username"
+          />
+          <input
+            type="password"
+            name="senha"
+            placeholder="Senha"
+            required
+            autocomplete="current-password"
+          />
+          <input type="submit" value="Entrar" />
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

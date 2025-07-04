@@ -1,0 +1,4 @@
+flask
+instagrapi
+python-dotenv
+pillow

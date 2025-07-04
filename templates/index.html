@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <title>Coleta Instagram - Painel</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body>
+  <div class="container">
+    <h1>Ferramenta Coleta Instagram</h1>
+    <a href="{{ url_for('logout') }}" style="color:#39ff14;float:right;margin-bottom:10px;"></a>
+    <form id="formBuscar">
+      <input type="text" id="username" placeholder="Digite o @username" required />
+      <button type="submit">Buscar</button>
+    </form>
+
+    <div id="resultado" class="resultado" style="display:none; margin-top: 20px;">
+      <h2 id="nome"></h2>
+      <p><strong>Username:</strong> <span id="user"></span></p>
+      <p><strong>Seguidores:</strong> <span id="seguidores"></span></p>
+      <p><strong>Seguindo:</strong> <span id="seguindo"></span></p>
+      <p><strong>Bio:</strong> <span id="bio"></span></p>
+    </div>
+
+    <button id="btnComentarios" style="display:none; margin-top: 20px;">Mostrar Comentários Públicos</button>
+
+    <div id="comentarios" style="display:none; margin-top: 20px;">
+      <h3>Comentários Públicos</h3>
+      <ul id="listaComentarios"></ul>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById("formBuscar");
+    const resultado = document.getElementById("resultado");
+    const btnComentarios = document.getElementById("btnComentarios");
+    const comentariosDiv = document.getElementById("comentarios");
+    const listaComentarios = document.getElementById("listaComentarios");
+
+    let ultimoUsername = "";
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const username = document.getElementById("username").value.trim();
+      if (!username) return;
+
+      try {
+        const response = await fetch("/api/buscar", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Erro ao buscar dados");
+        }
+
+        const data = await response.json();
+
+        document.getElementById("nome").innerText = data.nome;
+        document.getElementById("user").innerText = data.username;
+        document.getElementById("seguidores").innerText = data.seguidores;
+        document.getElementById("seguindo").innerText = data.seguindo;
+        document.getElementById("bio").innerText = data.bio;
+
+        resultado.style.display = "block";
+        btnComentarios.style.display = "inline-block";
+        comentariosDiv.style.display = "none";
+        listaComentarios.innerHTML = "";
+
+        ultimoUsername = username;
+      } catch (err) {
+        alert("Erro: " + err.message);
+        resultado.style.display = "none";
+        btnComentarios.style.display = "none";
+        comentariosDiv.style.display = "none";
+        listaComentarios.innerHTML = "";
+      }
+    });
+
+    btnComentarios.addEventListener("click", async () => {
+      if (!ultimoUsername) return;
+
+      try {
+        btnComentarios.disabled = true;
+        btnComentarios.innerText = "Carregando...";
+
+        const response = await fetch("/api/comentarios", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: ultimoUsername }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Erro ao buscar comentários");
+        }
+
+        const data = await response.json();
+
+        listaComentarios.innerHTML = "";
+
+        if (!data.comentarios || data.comentarios.length === 0) {
+          listaComentarios.innerHTML = "<li>Nenhum comentário público encontrado.</li>";
+        } else {
+          data.comentarios.forEach((c) => {
+            const li = document.createElement("li");
+            li.innerHTML = `
+              <a href="${c.post_url}" target="_blank" rel="noopener noreferrer">
+                ${c.text}
+              </a>
+              <br/><small>${new Date(c.created_at).toLocaleString()}</small>
+            `;
+            listaComentarios.appendChild(li);
+          });
+        }
+
+        comentariosDiv.style.display = "block";
+        btnComentarios.disabled = false;
+        btnComentarios.innerText = "Mostrar Comentários Públicos";
+
+      } catch (err) {
+        alert("Erro: " + err.message);
+        btnComentarios.disabled = false;
+        btnComentarios.innerText = "Mostrar Comentários Públicos";
+      }
+    });
+  </script>
+</body>
+</html>
