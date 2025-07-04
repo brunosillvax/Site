@@ -1,4 +1,6 @@
-flask
+Flask
 instagrapi
 python-dotenv
-pillow
+flask-cors
+gunicorn
+Pillow
