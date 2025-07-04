@@ -326,3 +326,66 @@ body {
   display: block;
   margin-top: 5px;
 }
+
+/* ===== Responsividade para telas menores ===== */
+@media (max-width: 480px) {
+  body {
+    padding: 10px;
+  }
+
+  .box {
+    width: 90vw;
+    height: auto;
+    padding: 20px 0;
+  }
+
+  .box:hover {
+    width: 90vw;
+    height: auto;
+  }
+
+  .login {
+    inset: 20px;
+  }
+
+  .loginBx {
+    width: 90%;
+    transform: translateY(0);
+  }
+
+  .loginBx h2 {
+    font-size: 1.5rem;
+  }
+
+  .loginBx input {
+    font-size: 1rem;
+    padding: 12px 15px;
+  }
+
+  /* Container da ferramenta coleta Instagram */
+  .container {
+    width: 95vw;
+    padding: 20px;
+  }
+
+  #formBuscar {
+    flex-direction: column;
+  }
+
+  #formBuscar input[type="text"],
+  #formBuscar button {
+    width: 100%;
+    margin: 8px 0;
+  }
+
+  /* Botão mostrar comentários */
+  #btnComentarios {
+    width: 100%;
+    padding: 12px 0;
+  }
+
+  /* Lista de comentários */
+  #listaComentarios {
+    max-height: 200px;
+  }
+}
