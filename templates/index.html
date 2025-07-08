@@ -4,27 +4,28 @@
   <meta charset="UTF-8" />
   <title>Coleta Instagram - Painel</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    /* Estilo rápido para o link sair */
-    .logout-link {
-      color: #39ff14;
-      float: right;
-      margin-bottom: 10px;
-      font-weight: bold;
-      text-decoration: none;
-      font-family: 'Poppins', sans-serif;
-      transition: color 0.3s ease;
-    }
-    .logout-link:hover {
-      color: #7fff7f;
-    }
-  </style>
 </head>
 <body>
+
+  <!-- Botão Sair (fixo) -->
+  <a href="{{ url_for('logout') }}" class="logout-fixo">
+    <i class="fa-solid fa-right-from-bracket"></i> Sair
+  </a>
+
+  <!-- Nome do usuário (fixo) -->
+  <div class="usuario-logado">
+    <i class="fa-solid fa-user"></i> {{ session['usuario_logado'] }}
+  </div>
+
   <div class="container">
     <h1>Ferramenta Coleta Instagram</h1>
-    <a href="{{ url_for('logout') }}" class="logout-link"></a>
+
+    <div id="loading" style="display:none; margin-top: 20px; color: #39ff14; font-weight: 700;">
+      <span>Buscando...</span>
+      <div class="barra-carregamento"></div>
+    </div>
 
     <form id="formBuscar">
       <input type="text" id="username" placeholder="Digite o @username" required />
@@ -37,6 +38,11 @@
       <p><strong>Seguidores:</strong> <span id="seguidores"></span></p>
       <p><strong>Seguindo:</strong> <span id="seguindo"></span></p>
       <p><strong>Bio:</strong> <span id="bio"></span></p>
+      <p><strong>Verificado:</strong> <span id="verificado"></span></p>
+      <p><strong>Conta Privada:</strong> <span id="privado"></span></p>
+      <p><strong>Posts:</strong> <span id="posts"></span></p>
+      <p><strong>Reels:</strong> <span id="reels"></span></p>
+      <p><strong>Categoria:</strong> <span id="categoria"></span></p>
     </div>
 
     <button id="btnComentarios" style="display:none; margin-top: 20px;">Mostrar Comentários Públicos</button>
@@ -53,7 +59,7 @@
     const btnComentarios = document.getElementById("btnComentarios");
     const comentariosDiv = document.getElementById("comentarios");
     const listaComentarios = document.getElementById("listaComentarios");
-
+    const loading = document.getElementById("loading");
     let ultimoUsername = "";
 
     form.addEventListener("submit", async (e) => {
@@ -61,6 +67,13 @@
 
       const username = document.getElementById("username").value.trim();
       if (!username) return;
+
+      // Mostrar loading e esconder resultado e comentários
+      loading.style.display = "block";
+      resultado.style.display = "none";
+      btnComentarios.style.display = "none";
+      comentariosDiv.style.display = "none";
+      listaComentarios.innerHTML = "";
 
       try {
         const response = await fetch("/api/buscar", {
@@ -81,11 +94,14 @@
         document.getElementById("seguidores").innerText = data.seguidores;
         document.getElementById("seguindo").innerText = data.seguindo;
         document.getElementById("bio").innerText = data.bio;
+        document.getElementById("verificado").innerText = data.verificado ? "Sim ✅" : "Não ❌";
+        document.getElementById("privado").innerText = data.privado ? "Sim 🔒" : "Não 🌐";
+        document.getElementById("posts").innerText = data.posts;
+        document.getElementById("reels").innerText = data.reels;
+        document.getElementById("categoria").innerText = data.categoria || "Não definida";
 
         resultado.style.display = "block";
         btnComentarios.style.display = "inline-block";
-        comentariosDiv.style.display = "none";
-        listaComentarios.innerHTML = "";
 
         ultimoUsername = username;
       } catch (err) {
@@ -94,6 +110,8 @@
         btnComentarios.style.display = "none";
         comentariosDiv.style.display = "none";
         listaComentarios.innerHTML = "";
+      } finally {
+        loading.style.display = "none";
       }
     });
 
@@ -116,7 +134,6 @@
         }
 
         const data = await response.json();
-
         listaComentarios.innerHTML = "";
 
         if (!data.comentarios || data.comentarios.length === 0) {
@@ -135,11 +152,9 @@
         }
 
         comentariosDiv.style.display = "block";
-        btnComentarios.disabled = false;
-        btnComentarios.innerText = "Mostrar Comentários Públicos";
-
       } catch (err) {
         alert("Erro: " + err.message);
+      } finally {
         btnComentarios.disabled = false;
         btnComentarios.innerText = "Mostrar Comentários Públicos";
       }

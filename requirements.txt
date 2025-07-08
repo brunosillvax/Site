@@ -1,6 +1,6 @@
 Flask
+flask-cors
 instagrapi
 python-dotenv
-flask-cors
 gunicorn
 Pillow

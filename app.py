@@ -17,8 +17,6 @@ CORS(app, origins=["https://brunosillvax.github.io"])
 
 app.secret_key = os.getenv("SECRET_KEY") or "chave_secreta_qualquer"
 
-# resto do seu código segue igual
-
 cl = Client()
 session_path = "sessions/insta_session.json"
 username_login = os.getenv("INSTAGRAM_USERNAME")
@@ -81,6 +79,14 @@ def buscar():
 
     try:
         user = cl.user_info_by_username(username)
+
+        # Coleta quantidade de reels (se possível)
+        try:
+            reels = cl.user_clips(user.pk, amount=20)
+            reels_count = len(reels)
+        except:
+            reels_count = 0
+
         dados = {
             "username": username,
             "nome": user.full_name,
@@ -88,7 +94,13 @@ def buscar():
             "seguidores": user.follower_count,
             "seguindo": user.following_count,
             "bio": user.biography,
+            "verificado": "Sim" if user.is_verified else "Não",
+            "privado": "Sim" if user.is_private else "Não",
+            "posts": user.media_count,
+            "reels": reels_count,
+            "categoria": user.category_name or "Não informada"
         }
+
         return jsonify(dados)
 
     except UserNotFound:
@@ -102,7 +114,8 @@ def buscar():
 
 @app.route("/api/comentarios", methods=["POST"])
 def comentarios():
-
+    if "usuario_logado" not in session:
+        return jsonify({"error": "Usuário não autenticado"}), 401
 
     data = request.json
     username = data.get("username", "").strip()
